@@ -85,7 +85,6 @@ export const loginUser = asyncHandler(async (req,res)=>{
     }
 
     // check if the password matches the hashed password in the database
-
     const isMatch = await bcrypt.compare(password, userExist.password);
     if(!isMatch){
         return res.status(400).json({"message":"Invalid Credentials"});
@@ -109,7 +108,7 @@ export const loginUser = asyncHandler(async (req,res)=>{
 
         //send back the user and token in the response to the client
 
-        res.status(201).json({
+        res.status(200).json({
             _id, 
             name, 
             email, 
@@ -122,8 +121,12 @@ export const loginUser = asyncHandler(async (req,res)=>{
     }
     else{
         return res.status(400).json({"message":"Invalid email or password"});
-
     }
-
-
 });
+
+//logout user
+
+export const logoutUser = asyncHandler(async (req,res)=>{
+    res.clearCookie("token");
+    res.status(200).json({"message":"User Logged Out"});
+})
