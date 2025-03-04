@@ -146,3 +146,34 @@ export const getUser = asyncHandler(async (req,res)=>{
     }
 
 });
+
+export const updateUser  = asyncHandler(async (req,res)=>{
+    // get user details from the token -->> protect middleware
+    const user = await User.findById(req.user._id);
+
+    if(user){
+        //user properties to update
+        const {name,bio,photo} = req.body;
+        //update the user properties
+        user.name = req.body.name || user.name;
+        user.bio = req.body.bio || user.bio;
+        user.photo = req.body.photo || user.photo;
+
+        const updated = await user.save();
+
+        res.status(200).json({
+            _id: updated._id, 
+            name: updated.name, 
+            email: updated.email, 
+            role: updated.role, 
+            photo: updated.photo, 
+            bio: updated.bio, 
+            isVerified: updated.isVerified,
+        });
+    }
+    else{
+        //404 not found
+        res.status(404).json({"message":"User not found"});
+    }
+
+});
