@@ -24,7 +24,6 @@ app.use(cookieParser());
 //routes
 
 const routeFiles = fs.readdirSync("./src/routes");
-console.log(routeFiles);
 
 routeFiles.forEach((file)=>{
     //use dynamic import 
