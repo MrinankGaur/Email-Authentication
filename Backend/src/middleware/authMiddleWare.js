@@ -39,4 +39,28 @@ export const adminMiddleware = asyncHandler(async (req,res,next)=>{
 
      res.status(403).json({"message":"Only Admins can do this!"});
      //if not admin, send 403 forbidded --> terminate request
-})
+});
+
+export const creatorMiddleware = asyncHandler(async (req,res,next)=>{
+    if((req.user && req.user.role ==="creator")&&(req.user && req.user.role ==="admin")){
+       //if user is creator , move to the next middelware,controller
+       next();
+       return;
+    }
+
+    res.status(403).json({"message":"Only creators can do this!"});
+    //if not admin, send 403 forbidded --> terminate request
+});
+
+// verified middleware
+
+export const verifiedMiddleware = asyncHandler(async (req,res,next)=>{
+    if(req.user && req.user.isVerified){
+       //if user is verified , move to the next middelware,controller
+       next();
+       return;
+    }
+
+    res.status(403).json({"message":"Please verify your email address!"});
+    //if not admin, send 403 forbidded --> terminate request
+});
