@@ -379,3 +379,30 @@ export const resetPassword = asyncHandler(async(req,res)=>{
 
 
 });
+
+export const changePassword = asyncHandler(async(req, res)=>{
+    const {currentPassword, newPassword} = req.body;
+
+    console.log(req.user);
+    if(!currentPassword || !newPassword){
+        return res.status(400).json({message:"All fields are required"});
+    }
+
+    const user = await User.findById(req.user._id);
+
+    //compare current password with one hashed in the database
+
+    const isMatch = await bcrypt.compare(currentPassword,user.password);
+
+    if(!isMatch){
+        return res.status(400).json({message:"Invalid password!"});
+    }
+    if(isMatch){
+        user.password = newPassword;
+        await user.save();
+        return res.status(200).json({message:"Password Changed Successfully"});
+    }else{
+        return res.status(400).json({message:"Password could not be changed"});
+
+    }
+});
