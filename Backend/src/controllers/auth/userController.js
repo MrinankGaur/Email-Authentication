@@ -344,3 +344,38 @@ export const  forgotPassword = asyncHandler(async (req,res)=>{
     }
 
 });
+
+export const resetPassword = asyncHandler(async(req,res)=>{
+    const {passwordResetToken} = req.params;
+    const { password } = req.body;
+
+    if(!password){
+        return res.status(400).json({message:"Password is Required"});
+    }
+
+    if(!passwordResetToken){
+        return res.status(400).json({message:"Invalid Password Reset Token"});
+    }
+
+    const hashedToken = hashToken(passwordResetToken);
+
+    const userToken = await Token.findOne({passwordResetToken: hashedToken,
+        expiresAt: { $gt: Date.now()},
+    });
+
+    if(!userToken){
+        return res.status(400).json({message:"Invalid or expired password reset Token"});
+    }
+
+    const user = await User.findById(userToken.userId);
+
+    //update user password
+
+    user.password = password;
+
+    await user.save();
+
+    return res.status(200).json({message:"Password Reset Successfully"});
+
+
+});
