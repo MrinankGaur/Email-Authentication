@@ -13,7 +13,7 @@ export const UserContextProvider = ({children})=>{
 
     const router = useRouter();
 
-    const [user, setUser] = useState(null);
+    const [user, setUser] = useState({});
     const [userState, setUserState] = useState({
         name:"",
         email:"",
@@ -32,6 +32,7 @@ export const UserContextProvider = ({children})=>{
         }
         try {
             const res = await axios.post(`${serverUrl}/api/v1/register`,userState);
+            console.log("User Registered Successfully",res.data);
             toast.success("User Registered Successfully");
             console.log(res.data);
             //clear the form
@@ -48,7 +49,79 @@ export const UserContextProvider = ({children})=>{
         }
     };
 
-    // dynamic form handler
+    //login the user
+
+    const loginUser = async (e) => {
+        e.preventDefault();
+        try {
+            const res = await axios.post(`${serverUrl}/api/v1/login`,{
+                email: userState.email,
+                password: userState.password,
+            },{
+                withCredentials: true, //send cookies to the server
+            });
+
+            toast.success("User logged in successfully");
+
+            //clear the form
+            setUserState({
+                email:"",
+                password:"",
+            });
+
+            // push the user to dashboard page
+            //redirect user to the login page
+            router.push("/");
+           
+
+
+        } catch (error) {
+            console.log("Error logging in user",error);
+            toast.error(error.respone.data.message);
+            
+        }
+    }
+
+    //logout the user
+
+    const logoutUser = async() => {
+        try {
+            const res = await axios.get(`${serverUrl}/api/v1/logout`,{
+                withCredentials: true, //send cookies to the server
+            });
+
+            toast.success("User logged out successfully");
+            //redirect user to the login page
+            router.push("/login");
+        } catch (error) {
+            console.log("Error logging out user",error);
+            toast.error(error.respone.data.message);
+        }
+    };
+
+
+    //get user logged in status
+
+    const userLoginStatus = async() => {
+        let loggedIn = false;
+        try {
+            const res = await axios.get(`${serverUrl}/api/v1/login-status`,{
+                withCredentials: true, //send cookies to the server
+            });
+
+            //coerce the string to boolean
+
+            loggedIn = !!res.data;
+            setLoading(false);
+            if(!loggedIn){
+                router.push("/login");
+            }
+        } catch (error) {
+            console.log("Error getting user login status",error);
+        }
+        return loggedIn;
+    };
+    //dynamic form handler
 
     const handlerUserInput = (name) => (e)=>{
         const value = e.target.value;
@@ -58,12 +131,18 @@ export const UserContextProvider = ({children})=>{
         }));
     };
 
+    useEffect(()=> {
+        userLoginStatus();
+    },[]);
+
     
     return(
         <UserContext.Provider value={{
             registerUser,
             userState,
-            handlerUserInput
+            handlerUserInput,
+            loginUser,
+            logoutUser,
         }}>
             {children}
         </UserContext.Provider>
