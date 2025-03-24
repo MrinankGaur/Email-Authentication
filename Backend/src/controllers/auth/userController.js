@@ -184,21 +184,38 @@ export const updateUser  = asyncHandler(async (req,res)=>{
 });
 
 //check user login status
-export const userLoginStatus = asyncHandler(async (req,res)=>{
+// export const userLoginStatus = asyncHandler(async (req, res) => {
+//     const token = req.cookies.token;
+  
+//     if (!token) {
+//       // 401 Unauthorized
+//       res.status(401).json({ message: "Not authorized, please login!" });
+//     }
+//     // verify the token
+//     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+  
+//     if (decoded) {
+//       res.status(200).json(true);
+//     } else {
+//       res.status(401).json(false);
+//     }
+//   });
+export const userLoginStatus = asyncHandler(async (req, res) => {
     const token = req.cookies.token;
-
-    if(!token){
-        res.status(401).json({message:"Not Authorized, please login"});
+  
+    if (!token) {
+      // 401 Unauthorized
+      res.status(401).json({ message: "Not authorized, please login!" });
     }
-    //verify the token
-    const decoded = jwt.verify(token,process.env.JWT_SECRET);
-    if(decoded){
-        res.status(200).json(true);
-    }else{
-        //401 unauthorized
-        res.status(200).json(false);
+    // verify the token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+  
+    if (decoded) {
+      res.status(200).json(true);
+    } else {
+      res.status(401).json(false);
     }
-});
+  });
 
 //email verification
 

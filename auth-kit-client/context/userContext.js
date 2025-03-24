@@ -19,7 +19,7 @@ export const UserContextProvider = ({children})=>{
         email:"",
         password:"",
     });
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
 
 
     //register user
@@ -69,7 +69,8 @@ export const UserContextProvider = ({children})=>{
                 password:"",
             });
 
-            // push the user to dashboard page
+            //refresh the user details;
+            await getUser(); //fetch before redirecting
             //redirect user to the login page
             router.push("/");
            
@@ -102,25 +103,92 @@ export const UserContextProvider = ({children})=>{
 
     //get user logged in status
 
-    const userLoginStatus = async() => {
+    // const userLoginStatus = async() => {
+    //     let loggedIn = false;
+    //     try {
+    //         const res = await axios.get(`${serverUrl}/api/v1/login-status`,{
+    //             withCredentials: true, //send cookies to the server
+    //         });
+
+    //         //coerce the string to boolean
+
+    //         loggedIn = !!res.data;
+    //         setLoading(false);
+    //         if(!loggedIn){
+    //             router.push("/login");
+    //         }
+    //     } catch (error) {
+    //         console.log("Error getting user login status",error);
+    //     }
+    //     console.log("User logged in status",loggedIn);
+    //     return loggedIn;
+    // };
+
+    const userLoginStatus = async () => {
         let loggedIn = false;
         try {
-            const res = await axios.get(`${serverUrl}/api/v1/login-status`,{
-                withCredentials: true, //send cookies to the server
-            });
-
-            //coerce the string to boolean
-
-            loggedIn = !!res.data;
-            setLoading(false);
-            if(!loggedIn){
-                router.push("/login");
-            }
+          const res = await axios.get(`${serverUrl}/api/v1/login-status`, {
+            withCredentials: true, // send cookies to the server
+          });
+    
+          // coerce the string to boolean
+          loggedIn = !!res.data;
+          setLoading(false);
+    
+          if (!loggedIn) {
+            router.push("/login");
+          }
         } catch (error) {
-            console.log("Error getting user login status",error);
+          console.log("Error getting user login status", error);
         }
+    
         return loggedIn;
-    };
+      };
+    
+    //get user details
+
+    // const getUser = async() => {
+    //     setLoading(true);
+    //     try {
+    //         const res = await axios.get(`${serverUrl}/api/v1/user`,{
+    //             withCredentials: true, //send cookies to the server
+    //         });
+
+    //         setUser((prevState)=>{
+    //             return {
+    //                 ...prevState,
+    //                 ...res.data,
+    //             };
+    //         });
+    //         setLoading(false);
+    //     } catch (error) {
+    //         console.log("Error getting user details",error);
+    //         setLoading(false);
+    //         toast.error(error.resposne.data.message);
+    //     }
+    // };
+    const getUser = async () => {
+        setLoading(true);
+        try {
+          const res = await axios.get(`${serverUrl}/api/v1/user`, {
+            withCredentials: true, // send cookies to the server
+          });
+    
+          setUser((prevState) => {
+            return {
+              ...prevState,
+              ...res.data,
+            };
+          });
+    
+          setLoading(false);
+        } catch (error) {
+          console.log("Error getting user details", error);
+          setLoading(false);
+          toast.error(error.response.data.message);
+        }
+      };
+
     //dynamic form handler
 
     const handlerUserInput = (name) => (e)=>{
@@ -132,8 +200,16 @@ export const UserContextProvider = ({children})=>{
     };
 
     useEffect(()=> {
-        userLoginStatus();
+       const loginStatusGetUser = async () => {
+            const isLoggedIn = await userLoginStatus();
+            console.log("isLoggedIn",isLoggedIn);
+            if(isLoggedIn){
+                getUser();
+            }
+       };
     },[]);
+
+    console.log("User",user);
 
     
     return(
@@ -143,6 +219,8 @@ export const UserContextProvider = ({children})=>{
             handlerUserInput,
             loginUser,
             logoutUser,
+            userLoginStatus,
+            user,
         }}>
             {children}
         </UserContext.Provider>
