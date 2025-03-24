@@ -6,7 +6,7 @@ import { useState } from "react";
 
 export default function Home() {
   useRedirect("/login");
-  const {logoutUser, user, handlerUserInput, userState} = useUserContext();
+  const {logoutUser, user, handlerUserInput, userState, updateUser} = useUserContext();
   const {name, photo, isVerified, bio} = user;
 
   //state
@@ -50,7 +50,7 @@ export default function Home() {
           </button>
         </h1>
         {isOpen &&  (
-          <form className="mt-4">
+          <form className="mt-4 max-w-[400px] w-full">
             <div className="flex flex-col">
             <label htmlFor="bio" className="mb-1 text-[#999]">
               Bio
@@ -62,6 +62,12 @@ export default function Home() {
               onChange={(e)=> handlerUserInput("bio")(e)}
             ></textarea>
             </div>
+            <button 
+            onClick={(e)=>updateUser(e,{bio: userState.bio})}
+            type="submit" 
+            className="px-4 py-3 bg-blue-500 text-white rounded-md">
+              Update Bio
+            </button>
           </form>
         )}
       </section>

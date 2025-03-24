@@ -199,6 +199,32 @@ export const UserContextProvider = ({children})=>{
         }));
     };
 
+    //update user details
+    const updateUser = async(e, data)=>{
+        e.preventDefault();
+        setLoading(true);
+        try {
+            const res = await axios.patch(`${serverUrl}/api/v1/user`,data,{
+                withCredentials: true,
+            });
+
+            setUser((prevState)=>{
+                return{
+                    ...prevState,
+                    ...res.data,
+                };
+            });
+
+            toast.success("User updated successfully")
+            setLoading(false);
+        } catch (error) {
+            console.log("Error updating user details", error);
+            setLoading(false);
+            toast.error(error.response.data.message);
+            
+        }
+    };
+
     useEffect(()=> {
        const loginStatusGetUser = async () => {
             const isLoggedIn = await userLoginStatus();
@@ -221,6 +247,7 @@ export const UserContextProvider = ({children})=>{
             logoutUser,
             userLoginStatus,
             user,
+            updateUser,
         }}>
             {children}
         </UserContext.Provider>
