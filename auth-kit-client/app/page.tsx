@@ -65,7 +65,7 @@ export default function Home() {
             <button 
             onClick={(e)=>updateUser(e,{bio: userState.bio})}
             type="submit" 
-            className="px-4 py-3 bg-blue-500 text-white rounded-md">
+            className="mt-4 px-4 py-3 bg-blue-500 text-white rounded-md">
               Update Bio
             </button>
           </form>
