@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
-import React ,{createContext, useEffect, useState, useContext} from 'react'
+import React ,{useEffect, useState, useContext} from 'react';
 import toast from 'react-hot-toast';
 
 
@@ -225,6 +225,58 @@ export const UserContextProvider = ({children})=>{
         }
     };
 
+    //email verification
+
+    const emailVerification = async() => {
+        setLoading(true);
+
+        try {
+            const res = await axios.post(`${serverUrl}/api/v1/send-email`,
+                {},
+                {
+                withCredentials: true,
+                }
+        );
+
+        toast.success("Email verification sent successfully");
+        } catch (error) {
+            console.log("Error sending verification email", error);
+            setLoading(false);
+            toast.error(error.response.data.message);
+        }
+    }
+
+    //verify the user
+    const verifyUser = async(token) =>{
+        setLoading(true);
+
+        try {
+            const res = await axios.post(`${serverUrl}/api/v1/verify-user/${token}`,
+                {},
+                {
+                    withCredentials: true,
+                },
+            );
+
+            toast.success("User verified successfully");
+            
+            
+            //refresh the user details
+            getUser();
+            
+            setLoading(false);
+            //redirect user to home Page
+            router.push("/");
+
+
+
+        } catch (error) {
+            console.log("Error verifying user", error);
+            toast.error(error.response.data.message);
+            setLoading(false);
+        }
+    }
+
     useEffect(()=> {
        const loginStatusGetUser = async () => {
             const isLoggedIn = await userLoginStatus();
@@ -234,8 +286,6 @@ export const UserContextProvider = ({children})=>{
             }
        };
     },[]);
-
-    console.log("User",user);
 
     
     return(
@@ -248,6 +298,8 @@ export const UserContextProvider = ({children})=>{
             userLoginStatus,
             user,
             updateUser,
+            emailVerification,
+            verifyUser,
         }}>
             {children}
         </UserContext.Provider>
