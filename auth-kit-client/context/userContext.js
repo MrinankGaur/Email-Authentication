@@ -301,6 +301,35 @@ export const UserContextProvider = ({children})=>{
         }
     }
 
+    // reset password
+
+    const resetPassword = async(token,password) => {
+        setLoading(true);
+        try {
+            const res = await axios.post(
+                `${serverUrl}/api/v1/reset-password/${token}`,
+                {
+                    password,
+                },
+                {
+                    withCredentials: true,
+                }
+            );
+
+            toast.success("Passowrd reset successfully");
+            setLoading(false);
+
+            //redirect to login
+            router.push("/login");
+
+        } catch (error) {
+            console.log("Error resetting password", error);
+            toast.error(error.response.data.message);
+            setLoading(false);
+        }
+    };
+
+
     useEffect(()=> {
        const loginStatusGetUser = async () => {
             const isLoggedIn = await userLoginStatus();
@@ -325,6 +354,7 @@ export const UserContextProvider = ({children})=>{
             emailVerification,
             verifyUser,
             forgotPasswordEmail,
+            resetPassword,
         }}>
             {children}
         </UserContext.Provider>
