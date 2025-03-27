@@ -7,7 +7,16 @@ import ChangePasswordForm from "./Components/auth/ChangePasswordForm/ChangePassw
 
 export default function Home() {
   useRedirect("/login");
-  const {logoutUser, user, handlerUserInput, userState, updateUser,emailVerification} = useUserContext();
+  const {
+    logoutUser, 
+    user, 
+    handlerUserInput, 
+    userState, 
+    updateUser,
+    emailVerification, 
+    allUsers,
+    deleteUser,
+  } = useUserContext();
   const {name, photo, isVerified, bio} = user;
 
   //state
@@ -77,11 +86,41 @@ export default function Home() {
           </form>
         )}
       </section>
-      <div className="flex gap-8">
+      <div className="mt-4 flex gap-8">
         <div className="flex-1">
         <ChangePasswordForm/>
         </div>
-        <div className="flex-1"></div>
+        <div className="flex-1">
+          {
+            user.role === "admin" && (
+              <ul>
+              {allUsers.map((user: any)=>(
+                user.rol !=="admin" && (
+                  <li 
+                  key={user._id} 
+                  className="mb-2 px-2 py-3 border grid grid-cols-4 items-center gap-8"
+                >
+                  <img 
+                    src={user.photo} 
+                    alt={user.name} 
+                    className="w-[40px] h-[40px] rounded-full"
+                  />
+                  <p>{user.name}</p>
+                  <p>{user.bio}</p>
+                  <button
+                    className="bg-red-500 text-white p-2 rounded-md"
+                    onClick={()=> deleteUser(user._id)}
+                  >
+                    Delete user
+                  </button>
+                </li>
+                )
+              
+              ))}
+            </ul>
+            )
+          }
+        </div>
       </div>
       
     </main>

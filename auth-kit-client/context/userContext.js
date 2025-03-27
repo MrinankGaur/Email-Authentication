@@ -7,12 +7,15 @@ import toast from 'react-hot-toast';
 
 const UserContext = React.createContext();
 
+//set axios to include credentials with every request;
+axios.defaults.withCredentials = true;
+
 export const UserContextProvider = ({children})=>{
     
     const serverUrl = "http://localhost:8000";
 
     const router = useRouter();
-
+    const [allUsers, setAllUsers] = useState([]);
     const [user, setUser] = useState({});
     const [userState, setUserState] = useState({
         name:"",
@@ -358,15 +361,66 @@ export const UserContextProvider = ({children})=>{
         }
     };
 
+    //admin routes
+
+    const getAllusers = async() => {
+        setLoading(true);
+
+        try {
+            const res = await axios.get(`${serverUrl}/api/v1/admin/users`,
+                {},
+                {
+                    withCredentials: true,
+                },
+            );
+            setAllUsers(res.data);
+            setLoading(false);
+        } catch (error) {
+            console.log("Error getting all users", error);
+            toast.error(error.response.data.message);
+            setLoading(false); 
+        }
+    }
+
+    //delete user
+
+    const deleteUser = async(id) => {
+        setLoading(true);
+        try {
+            const res = await axios.delete(
+                `${serverUrl}/api/v1/admin/users/${id}`,
+                {},
+                {
+                    withCredentials: true,
+                },
+            );
+            toast.success("User delete successfully");
+            setLoading(false);
+            //refresh the user list
+            getAllusers();
+        } catch (error) {
+            onsole.log("Error deleting user", error);
+            toast.error(error.response.data.message);
+            setLoading(false); 
+        }
+    };
+
     useEffect(()=> {
        const loginStatusGetUser = async () => {
             const isLoggedIn = await userLoginStatus();
             console.log("isLoggedIn",isLoggedIn);
             if(isLoggedIn){
-                getUser();
+                await getUser();
             }
        };
+       loginStatusGetUser();
     },[]);
+
+    useEffect(()=>{
+        if(user.role==="admin"){
+            getAllusers();
+        }
+    },[user.role]);
 
     
     return(
@@ -384,6 +438,8 @@ export const UserContextProvider = ({children})=>{
             forgotPasswordEmail,
             resetPassword,
             changePassword,
+            allUsers,
+            deleteUser,
         }}>
             {children}
         </UserContext.Provider>

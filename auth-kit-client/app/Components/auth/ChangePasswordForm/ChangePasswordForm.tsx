@@ -44,7 +44,7 @@ function ChangePasswordForm() {
 
 
   return (
-    <form className=" ml-0 m-[2rem] px-10 py-14 rounded-lg bg-white max-w-[520px] w-full">
+    <form className=" ml-0 mt-0 m-[2rem] px-10 py-14 rounded-lg bg-white max-w-[520px] w-full">
     <div className="relative z-10">
       <h1 className="mb-2 text-center text-[1.35rem] font-medium">
         Change Your Password!
